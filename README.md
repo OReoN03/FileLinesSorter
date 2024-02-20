@@ -2,12 +2,14 @@
 Simple console application to sort large text files (more than 1 GB).
 ## Usage
 Run the Main class to start the application.
+
 From cmd:
 ```
-java Main input.txt output.txt txt true
+javac -d target\classes -sourcepath src\main\java src\main\java\org\example\Main.java
+java -classpath target\classes org.example.Main "inputFileName" "outputFileName" txt true
 ```
 Where:
-- input.txt - the name of the input file
-- output.txt - the name of the file in which the sorted result will be written
+- input - the absolute path of the input file (quotation marks are required)
+- output - the absolute path of the file in which the sorted result will be written (quotation marks are required)
 - txt - output format ("json", "xml" or "txt")
-- false - sorting direction (true for ascending, false for descending)
+- true - sorting direction (true for ascending, false for descending)
