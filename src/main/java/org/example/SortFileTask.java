@@ -21,16 +21,14 @@ public class SortFileTask extends RecursiveAction {
 
     @Override
     public void compute() {
-        try {
-            List<String> lines;
-            try (Stream<String> ln = Files.lines(file.toPath())) {
-                lines = ln.collect(Collectors.toList());
-            }
+        List<String> lines;
+        try (Stream<String> ln = Files.lines(file.toPath())) {
+            lines = ln.collect(Collectors.toList());
             lines.sort(comparator);
             try (BufferedWriter bw = Files.newBufferedWriter(file.toPath())) {
                 for (String line : lines) {
                     bw.write(line);
-                    bw.write("\r\n");
+                    bw.newLine();
                 }
             }
         } catch (IOException e) {

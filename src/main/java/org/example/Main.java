@@ -10,11 +10,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-/*
-javac -d target\classes -sourcepath src\main\java src\main\java\org\example\Main.java
-java -classpath target\classes org.example.Main C:\Users\Artem\IdeaProjects\FileLinesSorter\src\main\resources\sample3.txt C:\Users\Artem\IdeaProjects\FileLinesSorter\src\main\resources\output.txt txt true
-*/
-
 public class Main {
     public static void main(String[] args) throws IOException {
         long start = System.nanoTime();
@@ -23,30 +18,29 @@ public class Main {
         String format = args[2];
         boolean ascending = Boolean.parseBoolean(args[3]);
 
-        /*System.out.println("Generating large file...");
-        FileHelper.generateLargeTextFile(inputFileName);
-        System.out.println("Done generating.");*/
-
+        int sizeOfChunk = 32 * 1024 * 1024;
         Path fullPath = new File(inputFileName).toPath();
         Comparator<String> comparator = ascending ? Comparator.naturalOrder() : Comparator.reverseOrder();
         FileMerger fileMerger = null;
-        List<File> files = FileSplitSortMerge.splitAndSortTempFiles(fullPath.toAbsolutePath().toString(),
-                String.valueOf(fullPath.toAbsolutePath().getParent()), 25, comparator);
+        System.out.println("Started splitting file and sorting temp files...");
+        List<File> files = FileSplitSort.splitAndSortTempFiles(fullPath.toAbsolutePath().toString(),
+                fullPath.toAbsolutePath().getParent() + "\\temp", sizeOfChunk, comparator);
         switch (format) {
-            case "json" :
-                fileMerger = new JSONFileMerger(files, outputFileName, comparator);
+            case "json" : fileMerger = new JSONFileMerger(files, outputFileName, comparator);
                 break;
-            case "xml" :
-                fileMerger = new XMLFileMerger(files, outputFileName, comparator);
+            case "xml" : fileMerger = new XMLFileMerger(files, outputFileName, comparator);
                 break;
-            case "txt" :
-                fileMerger = new TXTFileMerger(files, outputFileName, comparator);
+            case "txt" : fileMerger = new TXTFileMerger(files, outputFileName, comparator);
                 break;
         }
+        System.out.println("Done sorting temp files.");
+
+        System.out.println("Started merging temp files...");
         assert fileMerger != null;
         fileMerger.mergeSortedFiles();
+        System.out.println("Done sorting large file.");
 
         long end = System.nanoTime();
-        System.out.println("Time spent: " + (end - start) / 1_000_000_000);
+        System.out.println("Time spent: " + (end - start) / 1_000_000_000 + " seconds.");
     }
 }
